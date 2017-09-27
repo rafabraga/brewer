@@ -1,23 +1,25 @@
 package com.algaworks.brewer.repository.helper.cerveja;
 
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import com.algaworks.brewer.dto.CervejaDTO;
 import com.algaworks.brewer.model.Cerveja;
 import com.algaworks.brewer.repository.filter.CervejaFilter;
+import com.algaworks.brewer.repository.pagination.PaginationBuilder;
 
 public class CervejasImpl implements CervejasQueries {
 
@@ -28,21 +30,9 @@ public class CervejasImpl implements CervejasQueries {
     @SuppressWarnings({ "deprecation", "unchecked" })
     @Override
     public Page<Cerveja> filtrar(final CervejaFilter filtro, final Pageable pageable) {
-        final Criteria criteria = this.manager.unwrap(Session.class).createCriteria(Cerveja.class);
+        Criteria criteria = this.manager.unwrap(Session.class).createCriteria(Cerveja.class);
 
-        final int paginaAtual = pageable.getPageNumber();
-        final int totalRegistrosPorPagina = pageable.getPageSize();
-        final int primeiroRegistro = paginaAtual * totalRegistrosPorPagina;
-
-        criteria.setFirstResult(primeiroRegistro);
-        criteria.setMaxResults(totalRegistrosPorPagina);
-
-        final Sort sort = pageable.getSort();
-        if (sort != null) {
-            final Sort.Order order = sort.iterator().next();
-            final String field = order.getProperty();
-            criteria.addOrder(order.isAscending() ? Order.asc(field) : Order.desc(field));
-        }
+        criteria = new PaginationBuilder(criteria, pageable).withOrdination().builder();
 
         this.adicionarFiltro(filtro, criteria);
         return new PageImpl<>(criteria.list(), pageable, this.total(filtro));
@@ -90,6 +80,13 @@ public class CervejasImpl implements CervejasQueries {
 
     private boolean isEstiloPresente(final CervejaFilter filtro) {
         return (filtro.getEstilo() != null) && (filtro.getEstilo().getCodigo() != null);
+    }
+
+    @Override
+    public List<CervejaDTO> listarPorSkuOuNome(final String skuOuNome) {
+        final String jpql = "select new com.algaworks.brewer.dto.CervejaDTO(codigo, sku, nome, valor, origem, foto) "
+                + "from Cerveja where lower(sku) like lower(:skuOuNome) or lower(nome) like lower(:skuOuNome)";
+        return this.manager.createQuery(jpql, CervejaDTO.class).setParameter("skuOuNome", "%" + skuOuNome + "%").getResultList();
     }
 
 }

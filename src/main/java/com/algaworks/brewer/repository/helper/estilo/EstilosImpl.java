@@ -6,18 +6,17 @@ import javax.persistence.PersistenceContext;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.algaworks.brewer.model.Estilo;
 import com.algaworks.brewer.repository.filter.EstiloFilter;
+import com.algaworks.brewer.repository.pagination.PaginationBuilder;
 
 public class EstilosImpl implements EstilosQueries {
 
@@ -28,21 +27,9 @@ public class EstilosImpl implements EstilosQueries {
     @SuppressWarnings({ "deprecation", "unchecked" })
     @Override
     public Page<Estilo> filtrar(final EstiloFilter filtro, final Pageable pageable) {
-        final Criteria criteria = this.manager.unwrap(Session.class).createCriteria(Estilo.class);
+        Criteria criteria = this.manager.unwrap(Session.class).createCriteria(Estilo.class);
 
-        final int paginaAtual = pageable.getPageNumber();
-        final int totalRegistrosPorPagina = pageable.getPageSize();
-        final int primeiroRegistro = paginaAtual * totalRegistrosPorPagina;
-
-        criteria.setFirstResult(primeiroRegistro);
-        criteria.setMaxResults(totalRegistrosPorPagina);
-
-        final Sort sort = pageable.getSort();
-        if (sort != null) {
-            final Sort.Order order = sort.iterator().next();
-            final String field = order.getProperty();
-            criteria.addOrder(order.isAscending() ? Order.asc(field) : Order.desc(field));
-        }
+        criteria = new PaginationBuilder(criteria, pageable).withOrdination().builder();
 
         this.adicionarFiltro(filtro, criteria);
         return new PageImpl<>(criteria.list(), pageable, this.total(filtro));

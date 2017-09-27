@@ -27,13 +27,13 @@
 
         <div class="container-fluid">
         
-            <form method="post" th:object="${estilo}" class="form-vertical  js-form-loading">
+            <form method="post" th:object="${estilo}" class="form-vertical  js-form-loading" th:action="@{/estilos/novo}">
                 <brewer:message />
                 
                 <div class="row">
                     <div class="form-group col-sm-12 bw-required" brewer:classforerror="nome">
                         <label for="nome" class="control-label">Nome</label>
-                        <input id="nome" type="text" class="form-control" th:field="*{nome}"  />
+                        <input id="nome" type="text" class="form-control" th:field="*{nome}" />
                     </div>
                 </div>
                 

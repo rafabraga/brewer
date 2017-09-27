@@ -21,6 +21,7 @@
 		<servlet.version>3.1.0</servlet.version>
 		<thymeleaf.version>3.0.7.RELEASE</thymeleaf.version>
 		<thymeleaf.layout.dialect.version>2.2.2</thymeleaf.layout.dialect.version>
+		<thymeleaf-extras-data-attribute.version>2.0.1</thymeleaf-extras-data-attribute.version>
 		<hibernate.validator.version>5.4.1.Final</hibernate.validator.version>
 		<log4j.version>2.8.2</log4j.version>
 		<jcl.over.slf4j.version>1.7.25</jcl.over.slf4j.version>
@@ -28,6 +29,10 @@
 		<spring.data.jpa.version>1.10.2.RELEASE</spring.data.jpa.version>
 		<jackson.core.version>2.7.5</jackson.core.version>
 		<thumbnailator.version>0.4.8</thumbnailator.version>
+		<guava.version>23.0</guava.version>
+		<apache.commons.beanutils.version>1.9.3</apache.commons.beanutils.version>
+		<spring.security.version>4.2.3.RELEASE</spring.security.version>
+		<thymeleaf-extras-springsecurity4.version>3.0.2.RELEASE</thymeleaf-extras-springsecurity4.version>
 	</properties>
 
 	<build>
@@ -85,7 +90,7 @@
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
 			<version>${servlet.version}</version>
-			<scope>provides</scope>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- Thymeleaf -->
@@ -105,6 +110,20 @@
 			<groupId>nz.net.ultraq.thymeleaf</groupId>
 			<artifactId>thymeleaf-layout-dialect</artifactId>
 			<version>${thymeleaf.layout.dialect.version}</version>
+		</dependency>
+
+		<!-- Thymeleaf Extras Data Attribute -->
+		<dependency>
+			<groupId>com.github.mxab.thymeleaf.extras</groupId>
+			<artifactId>thymeleaf-extras-data-attribute</artifactId>
+			<version>${thymeleaf-extras-data-attribute.version}</version>
+		</dependency>
+
+		<!-- Thymeleaf Extras Spring Security 4 -->
+		<dependency>
+			<groupId>org.thymeleaf.extras</groupId>
+			<artifactId>thymeleaf-extras-springsecurity4</artifactId>
+			<version>${thymeleaf-extras-springsecurity4.version}</version>
 		</dependency>
 
 		<!-- Bean validation / Hibernate Validator -->
@@ -173,7 +192,37 @@
 			<version>${thumbnailator.version}</version>
 		</dependency>
 
+		<!-- Cache - Guava -->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>${guava.version}</version>
+		</dependency>
 
+		<!-- Spring Context Support -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+		</dependency>
+
+		<!-- Apache Commons BeanUtils -->
+		<dependency>
+			<groupId>commons-beanutils</groupId>
+			<artifactId>commons-beanutils</artifactId>
+			<version>${apache.commons.beanutils.version}</version>
+		</dependency>
+
+		<!-- Spring Security -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-web</artifactId>
+			<version>${spring.security.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-config</artifactId>
+			<version>${spring.security.version}</version>
+		</dependency>
 
 
 	</dependencies>
