@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
@@ -16,6 +17,7 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Max;
@@ -25,8 +27,10 @@ import javax.validation.constraints.Size;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.util.StringUtils;
 
+import com.algaworks.brewer.repository.listener.CervejaEntityListener;
 import com.algaworks.brewer.validation.SKU;
 
+@EntityListeners(CervejaEntityListener.class)
 @Entity
 @Table(name = "cerveja")
 public class Cerveja implements Serializable {
@@ -39,10 +43,10 @@ public class Cerveja implements Serializable {
     private Long codigo;
 
     @SKU
-    @NotBlank(message = "SKU é obrigatório.")
+    @NotBlank
     private String sku;
 
-    @NotBlank(message = "Nome é obrigatório.")
+    @NotBlank
     private String nome;
 
     @Size(min = 1, max = 50, message = "O tamanho da descrição deve estar entre 1 e 50.")
@@ -85,6 +89,15 @@ public class Cerveja implements Serializable {
     @Column(name = "content_type")
     private String contentType;
 
+    @Transient
+    private boolean novaFoto;
+
+    @Transient
+    private String urlFoto;
+
+    @Transient
+    private String urlThumbnailFoto;
+
     /* Funções de callback do JPA. */
     @PrePersist
     @PreUpdate
@@ -94,6 +107,14 @@ public class Cerveja implements Serializable {
 
     public String getFotoOuMock() {
         return !StringUtils.isEmpty(this.foto) ? this.foto : "cerveja-mock.png";
+    }
+
+    public boolean temFoto() {
+        return !StringUtils.isEmpty(this.getFoto());
+    }
+
+    public boolean isNova() {
+        return this.codigo == null;
     }
 
     /**
@@ -276,6 +297,48 @@ public class Cerveja implements Serializable {
      */
     public void setContentType(final String contentType) {
         this.contentType = contentType;
+    }
+
+    /**
+     * @return the novaFoto
+     */
+    public boolean isNovaFoto() {
+        return this.novaFoto;
+    }
+
+    /**
+     * @param novaFoto the novaFoto to set
+     */
+    public void setNovaFoto(final boolean novaFoto) {
+        this.novaFoto = novaFoto;
+    }
+
+    /**
+     * @return the urlFoto
+     */
+    public String getUrlFoto() {
+        return this.urlFoto;
+    }
+
+    /**
+     * @param urlFoto the urlFoto to set
+     */
+    public void setUrlFoto(final String urlFoto) {
+        this.urlFoto = urlFoto;
+    }
+
+    /**
+     * @return the urlThumbnailFoto
+     */
+    public String getUrlThumbnailFoto() {
+        return this.urlThumbnailFoto;
+    }
+
+    /**
+     * @param urlThumbnailFoto the urlThumbnailFoto to set
+     */
+    public void setUrlThumbnailFoto(final String urlThumbnailFoto) {
+        this.urlThumbnailFoto = urlThumbnailFoto;
     }
 
     /*

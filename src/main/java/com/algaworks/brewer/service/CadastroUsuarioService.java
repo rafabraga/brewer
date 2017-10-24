@@ -23,18 +23,25 @@ public class CadastroUsuarioService {
 
     public void salvar(final Usuario usuario) {
         final Optional<Usuario> optionalUsuario = this.usuarios.findByEmailIgnoreCase(usuario.getEmail());
-        if (optionalUsuario.isPresent()) {
+        if (optionalUsuario.isPresent() && !optionalUsuario.get().equals(usuario)) {
             throw new EmailJaCadastradoException();
         }
         if (usuario.isNovo() && StringUtils.isEmpty(usuario.getSenha())) {
             throw new SenhaObrigatoriaUsuarioException();
         }
-        if (usuario.isNovo()) {
+        if (usuario.isNovo() || !StringUtils.isEmpty(usuario.getSenha())) {
             usuario.setSenha(this.passwordEncoder.encode(usuario.getSenha()));
             // Setar na confirmação por causa do bean validation, que verifica se senha e
             // confirmação são iguais.
-            usuario.setConfirmacaoSenha(usuario.getSenha());
+        } else if (StringUtils.isEmpty(usuario.getSenha())) {
+            usuario.setSenha(optionalUsuario.get().getSenha());
         }
+        usuario.setConfirmacaoSenha(usuario.getSenha());
+
+        if (!usuario.isNovo() && (usuario.getAtivo() == null)) {
+            usuario.setAtivo(optionalUsuario.get().getAtivo());
+        }
+
         this.usuarios.save(usuario);
     }
 

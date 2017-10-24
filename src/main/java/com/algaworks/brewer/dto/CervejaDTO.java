@@ -17,6 +17,7 @@ public class CervejaDTO implements Serializable {
     private BigDecimal valor;
     private String origem;
     private String foto;
+    private String urlThumbnailFoto;
 
     /**
      * @param codigo
@@ -118,6 +119,20 @@ public class CervejaDTO implements Serializable {
      */
     public void setFoto(final String foto) {
         this.foto = foto;
+    }
+
+    /**
+     * @return the urlThumbnailFoto
+     */
+    public String getUrlThumbnailFoto() {
+        return this.urlThumbnailFoto;
+    }
+
+    /**
+     * @param urlThumbnailFoto the urlThumbnailFoto to set
+     */
+    public void setUrlThumbnailFoto(final String urlThumbnailFoto) {
+        this.urlThumbnailFoto = urlThumbnailFoto;
     }
 
 }

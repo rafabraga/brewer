@@ -8,12 +8,12 @@ Brewer.MaskMoney = (function() {
 	}
 
 	MaskMoney.prototype.enable = function() {
-		this.decimal.maskMoney({
+		this.decimal.maskNumber({
 			decimal : ",",
 			thousands : "."
 		});
-		this.plain.maskMoney({
-			precision : 0,
+		this.plain.maskNumber({
+			integer : true,
 			thousands : "."
 		});
 	}
@@ -68,6 +68,11 @@ Brewer.MaskDate = (function() {
 	
 	MaskDate.prototype.enable = function() {
 		this.inputDate.mask('00/00/0000');
+		this.inputDate.datepicker({
+			orientation: 'bottom',
+			language: 'pt-BR',
+			autoclose: true
+		});
 	}
 	
 	return MaskDate;

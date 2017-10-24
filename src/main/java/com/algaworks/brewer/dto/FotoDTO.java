@@ -8,10 +8,12 @@ public class FotoDTO implements Serializable {
 
     private String nome;
     private String contentType;
+    private String url;
 
-    public FotoDTO(final String nome, final String contentType) {
+    public FotoDTO(final String nome, final String contentType, final String url) {
         this.nome = nome;
         this.contentType = contentType;
+        this.url = url;
     }
 
     /**
@@ -40,6 +42,20 @@ public class FotoDTO implements Serializable {
      */
     public void setContentType(final String contentType) {
         this.contentType = contentType;
+    }
+
+    /**
+     * @return the url
+     */
+    public String getUrl() {
+        return this.url;
+    }
+
+    /**
+     * @param url the url to set
+     */
+    public void setUrl(final String url) {
+        this.url = url;
     }
 
 }

@@ -4,12 +4,16 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface FotoStorage {
 
-    String salvarTemporariamente(MultipartFile[] files);
+    public final String THUMBNAIL_PREFIX = "thumbnail.";
 
-    byte[] recuperarFotoTemporaria(String nome);
-
-    void salvar(String foto);
+    String salvar(MultipartFile[] files);
 
     byte[] recuperarFoto(String nome);
+
+    byte[] recuperarThumbnail(String foto);
+
+    void excluir(String foto);
+
+    String getUrl(String foto);
 
 }

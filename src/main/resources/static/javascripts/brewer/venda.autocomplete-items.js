@@ -44,6 +44,6 @@ Brewer.Autocomplete = (function() {
 		return this.template(cerveja);
 	}
 	
-	return Autocomplete
+	return Autocomplete;
 	
 }());

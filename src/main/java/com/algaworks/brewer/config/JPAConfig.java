@@ -41,12 +41,12 @@ public class JPAConfig {
     }
 
     @Bean
-    public EntityManagerFactory entityManagerFactory(final DataSource dataSource,
-            final JpaVendorAdapter jpaVendorAdapter) {
+    public EntityManagerFactory entityManagerFactory(final DataSource dataSource, final JpaVendorAdapter jpaVendorAdapter) {
         final LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
         factory.setDataSource(dataSource);
         factory.setJpaVendorAdapter(jpaVendorAdapter);
         factory.setPackagesToScan(Cerveja.class.getPackage().getName());
+        factory.setMappingResources("sql/consultas-nativas.xml");
         factory.afterPropertiesSet();
         return factory.getObject();
     }

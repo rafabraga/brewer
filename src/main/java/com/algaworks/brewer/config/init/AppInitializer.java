@@ -2,12 +2,15 @@ package com.algaworks.brewer.config.init;
 
 import javax.servlet.Filter;
 import javax.servlet.MultipartConfigElement;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration.Dynamic;
 
 import org.springframework.web.filter.HttpPutFormContentFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 import com.algaworks.brewer.config.JPAConfig;
+import com.algaworks.brewer.config.MailConfig;
 import com.algaworks.brewer.config.SecurityConfig;
 import com.algaworks.brewer.config.ServiceConfig;
 import com.algaworks.brewer.config.WebConfig;
@@ -21,7 +24,7 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
 
     @Override
     protected Class<?>[] getServletConfigClasses() {
-        return new Class<?>[] { WebConfig.class };
+        return new Class<?>[] { WebConfig.class, MailConfig.class };
     }
 
     @Override
@@ -39,6 +42,12 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
     protected void customizeRegistration(final Dynamic registration) {
         // O Tomcat vai decidir onde guardar o arquivo temporário.
         registration.setMultipartConfig(new MultipartConfigElement(""));
+    }
+
+    @Override
+    public void onStartup(final ServletContext servletContext) throws ServletException {
+        super.onStartup(servletContext);
+        servletContext.setInitParameter("spring.profiles.default", "local");
     }
 
 }

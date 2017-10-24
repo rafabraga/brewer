@@ -15,6 +15,7 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.Subqueries;
+import org.hibernate.sql.JoinType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -54,6 +55,17 @@ public class UsuariosImpl implements UsuariosQueries {
         filtrados.forEach(u -> Hibernate.initialize(u.getGrupos()));
 
         return new PageImpl<>(filtrados, pageable, this.total(filtro));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @SuppressWarnings("deprecation")
+    public Usuario buscarComGrupos(final Long codigo) {
+        final Criteria criteria = this.manager.unwrap(Session.class).createCriteria(Usuario.class);
+        criteria.createAlias("grupos", "g", JoinType.LEFT_OUTER_JOIN);
+        criteria.add(Restrictions.idEq(codigo));
+        criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+        return (Usuario) criteria.uniqueResult();
     }
 
     private void adicionarFiltro(final UsuarioFilter filtro, final Criteria criteria) {

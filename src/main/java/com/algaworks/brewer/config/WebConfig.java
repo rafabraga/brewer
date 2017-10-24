@@ -2,8 +2,9 @@ package com.algaworks.brewer.config;
 
 import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+
+import javax.sql.DataSource;
 
 import org.springframework.beans.BeansException;
 import org.springframework.cache.CacheManager;
@@ -19,15 +20,17 @@ import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.data.repository.support.DomainClassConverter;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.format.datetime.standard.DateTimeFormatterRegistrar;
-import org.springframework.format.number.NumberStyleFormatter;
 import org.springframework.format.support.DefaultFormattingConversionService;
 import org.springframework.format.support.FormattingConversionService;
-import org.springframework.web.servlet.LocaleResolver;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.validation.Validator;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-import org.springframework.web.servlet.i18n.FixedLocaleResolver;
+import org.springframework.web.servlet.view.jasperreports.JasperReportsMultiFormatView;
+import org.springframework.web.servlet.view.jasperreports.JasperReportsViewResolver;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
 import org.thymeleaf.spring4.SpringTemplateEngine;
@@ -36,6 +39,7 @@ import org.thymeleaf.spring4.view.ThymeleafViewResolver;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ITemplateResolver;
 
+import com.algaworks.brewer.config.format.BigDecimalFormatter;
 import com.algaworks.brewer.controller.CervejasController;
 import com.algaworks.brewer.controller.converter.CidadeConverter;
 import com.algaworks.brewer.controller.converter.EstadoConverter;
@@ -53,6 +57,7 @@ import nz.net.ultraq.thymeleaf.LayoutDialect;
 @EnableWebMvc
 @EnableSpringDataWebSupport
 @EnableCaching
+@EnableAsync
 public class WebConfig extends WebMvcConfigurerAdapter implements ApplicationContextAware {
 
     private ApplicationContext applicationContext;
@@ -63,10 +68,23 @@ public class WebConfig extends WebMvcConfigurerAdapter implements ApplicationCon
     }
 
     @Bean
+    public ViewResolver jasperReportsViewResolver(final DataSource dataSource) {
+        final JasperReportsViewResolver resolver = new JasperReportsViewResolver();
+        resolver.setPrefix("classpath:/relatorios/");
+        resolver.setSuffix(".jasper");
+        resolver.setViewNames("relatorio_*");
+        resolver.setJdbcDataSource(dataSource);
+        resolver.setViewClass(JasperReportsMultiFormatView.class);
+        resolver.setOrder(0);
+        return resolver;
+    }
+
+    @Bean
     public ViewResolver viewResolver() {
         final ThymeleafViewResolver resolver = new ThymeleafViewResolver();
         resolver.setTemplateEngine(this.templateEngine());
         resolver.setCharacterEncoding("UTF-8");
+        resolver.setOrder(1);
         return resolver;
     }
 
@@ -104,10 +122,14 @@ public class WebConfig extends WebMvcConfigurerAdapter implements ApplicationCon
         conversionService.addConverter(new EstadoConverter());
         conversionService.addConverter(new GrupoConverter());
 
-        final NumberStyleFormatter bigDecimalFormatter = new NumberStyleFormatter("#,##0.00");
+        // final NumberStyleFormatter bigDecimalFormatter = new
+        // NumberStyleFormatter("#,##0.00");
+        final BigDecimalFormatter bigDecimalFormatter = new BigDecimalFormatter("#,##0.00");
         conversionService.addFormatterForFieldType(BigDecimal.class, bigDecimalFormatter);
 
-        final NumberStyleFormatter integerFormatter = new NumberStyleFormatter("#,#0");
+        // final NumberStyleFormatter integerFormatter = new
+        // NumberStyleFormatter("#,#0");
+        final BigDecimalFormatter integerFormatter = new BigDecimalFormatter("#,##0");
         conversionService.addFormatterForFieldType(Integer.class, integerFormatter);
 
         final DateTimeFormatterRegistrar dateTimeFormatter = new DateTimeFormatterRegistrar();
@@ -116,11 +138,6 @@ public class WebConfig extends WebMvcConfigurerAdapter implements ApplicationCon
         dateTimeFormatter.registerFormatters(conversionService);
 
         return conversionService;
-    }
-
-    @Bean
-    public LocaleResolver localeResolver() {
-        return new FixedLocaleResolver(new Locale("pt", "BR"));
     }
 
     @Bean
@@ -143,6 +160,18 @@ public class WebConfig extends WebMvcConfigurerAdapter implements ApplicationCon
     @Bean
     public DomainClassConverter<FormattingConversionService> domainClassConverter() {
         return new DomainClassConverter<FormattingConversionService>(this.mvcConversionService());
+    }
+
+    @Bean
+    public LocalValidatorFactoryBean validator() {
+        final LocalValidatorFactoryBean localValidatorFactoryBean = new LocalValidatorFactoryBean();
+        localValidatorFactoryBean.setValidationMessageSource(this.messageSource());
+        return localValidatorFactoryBean;
+    }
+
+    @Override
+    public Validator getValidator() {
+        return this.validator();
     }
 
 }
