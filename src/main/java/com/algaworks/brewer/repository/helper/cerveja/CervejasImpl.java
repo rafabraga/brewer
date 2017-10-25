@@ -23,6 +23,7 @@ import com.algaworks.brewer.model.Cerveja;
 import com.algaworks.brewer.repository.filter.CervejaFilter;
 import com.algaworks.brewer.repository.pagination.PaginationBuilder;
 import com.algaworks.brewer.storage.FotoStorage;
+import com.algaworks.brewer.storage.local.FotoStorageLocal;
 
 public class CervejasImpl implements CervejasQueries {
 
@@ -30,7 +31,7 @@ public class CervejasImpl implements CervejasQueries {
     private EntityManager manager;
 
     @Autowired
-    private FotoStorage fotoStorage;
+    private FotoStorageLocal fotoStorage;
 
     @Transactional(readOnly = true)
     @SuppressWarnings({ "deprecation", "unchecked" })

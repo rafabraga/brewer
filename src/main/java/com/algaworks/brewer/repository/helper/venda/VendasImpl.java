@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.algaworks.brewer.dto.VendaMes;
+import com.algaworks.brewer.dto.VendaOrigem;
 import com.algaworks.brewer.model.StatusVenda;
 import com.algaworks.brewer.model.TipoPessoa;
 import com.algaworks.brewer.model.Venda;
@@ -105,6 +106,26 @@ public class VendasImpl implements VendasQueries {
         }
 
         return vendasMes;
+    }
+
+    @Override
+    public List<VendaOrigem> totalPorOrigem() {
+        final List<VendaOrigem> vendasNacionalidade = this.manager.createNamedQuery("Vendas.totalPorOrigem", VendaOrigem.class)
+                .getResultList();
+
+        LocalDate now = LocalDate.now();
+        for (int i = 1; i <= 6; i++) {
+            final String mesIdeal = String.format("%d/%02d", now.getYear(), now.getMonth().getValue());
+
+            final boolean possuiMes = vendasNacionalidade.stream().filter(v -> v.getMes().equals(mesIdeal)).findAny().isPresent();
+            if (!possuiMes) {
+                vendasNacionalidade.add(i - 1, new VendaOrigem(mesIdeal, 0, 0));
+            }
+
+            now = now.minusMonths(1);
+        }
+
+        return vendasNacionalidade;
     }
 
     private void adicionarFiltro(final VendaFilter filtro, final Criteria criteria) {
